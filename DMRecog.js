@@ -4,7 +4,7 @@ const constants = require('./constants');
 class DMRecog{
 
 
-	constructor(machineType, machineLevel){
+	constructor(machineType, machineLevel, startingState){
 		if (machineType === 'EXP'){
 			this.stateMap = constants.EXP_STATE_MACHINE;
 			this.currentState = 'EXP_START';
@@ -13,6 +13,9 @@ class DMRecog{
 
 		this.machineType = machineType;
 		this.machineLevel = machineLevel;
+		this.stillProcessing = false;
+		this.emptyTransition = null;
+		this.currentState = startingState ? startingState : this.currentState;
 	}
 
 	digestSingleWordAndKeepState(word){
@@ -22,8 +25,10 @@ class DMRecog{
 		const currentPossibleTransferenceFunctions =constants.GLOBAL_TRANSFERENCE_FUNCTIONS[this.currentState];
 		this.terminalTransition = []; 
 		currentPossibleTransferenceFunctions.forEach((acceptableInputsArray, transferenceFunctionIndex) => {
-			if (!this.terminalTransition.length)this.terminalTransition = acceptableInputsArray.filter(transference => transference.indexOf(constants.TERM[0]) >= 0 || transference.indexOf(constants.TERM[1]) >= 0);
+			if (!this.terminalTransition.length)this.terminalTransition = acceptableInputsArray.filter(transference => constants.TERM.reduce((acc, term)=> acc && (transference.indexOf(term) >= 0)),true);
 			else this.terminalTransition = [];
+			
+			this.emptyTransition = acceptableInputsArray.filter(transference => transference.indexOf(constants.EMPTY_TRANSITION) >= 0).length > 0 ? transferenceFunctionIndex : null; 
 			// if we didn't find a suitable next state we try, else just ignore it,  we know where we are going
 			if (!wordValid && (acceptableInputsArray.includes(word.token) || acceptableInputsArray.includes(word.word))) {
 				// We found a suitable next Stateasddda asd
@@ -55,16 +60,22 @@ class DMRecog{
 		while(initialInputClone.length > 0){
 			let word = {};
 			if (this.pilha.length) {
-				//Temos uma pilha. Ela ira consumir as palavras ate que fique vazia.
+				//Temos uma pilha. Ela ira consumir o maior comprimento de palavras possivel.
 				//preciso retornar -O resto das palavras do array e o token
 				const resultadoPilha = this.pilha[this.pilha.length - 1].digestTheWordsArray(initialInputClone);
 				initialInputClone = resultadoPilha.leftWords;
-				word.word = resultadoPilha.word;
-				word.token = resultadoPilha.token;
 				if(resultadoPilha.leftWords.length > 0){
+					word.word = resultadoPilha.word;
+					word.token = resultadoPilha.token;
 					this.pilha = [];
+					this.stillProcessing = false;
 				}else{
-					return resultadoPilha; // We consumed everything. But we still have state machines on the stack. So it makes no sense in destroying them
+					// We consumed everything. But we still have state machines on the stack. So it makes no sense in destroying them
+					this.stillProcessing = true;
+					return {
+						word,
+						...resultadoPilha
+					}; 
 				}
 			}
 			if (!word.token) word = {...initialInputClone[0]};
@@ -80,13 +91,32 @@ class DMRecog{
 					console.log('Podemos andar usando: ' + this.terminalTransition);
 					this.pilha.push(new DMRecog(this.terminalTransition[0], this.machineLevel + 1));
 					return this.digestTheWordsArray(initialInputClone);
+				}else{
+					if(this.checkEmptyTransition(word)){
+						console.log('EMPTY SERVIRIA');
+						if(this.emptyTransition !== null && this.emptyTransition !== undefined){
+							this.currentState = constants.GLOBAL_STATE_MAPS[this.currentState][this.emptyTransition];
+							// put the word back and go again
+							initialInputClone = [word, ...initialInputClone];
+							return this.digestTheWordsArray(initialInputClone);
+						}else{
+							console.log('MAS CADE A EMPTY ?!');
+							//We didn't find nothing
+							return {
+								leftWords: [lastWord, ...initialInputClone],
+								word: lastWord && lastWord.word,
+								token: constants.ACCEPTION_STATES.includes(this.currentState) ? this.machineType : word.token ||null,
+							};
+						}
+					}
+					//We didn't find nothing
+					return {
+						leftWords: [lastWord, ...initialInputClone],
+						word: lastWord && lastWord.word,
+						token: constants.ACCEPTION_STATES.includes(this.currentState) ? this.machineType : word.token ||null,
+					};
 				}
-				//We didn't find nothing
-				return {
-					leftWords: [lastWord, ...initialInputClone],
-					word: lastWord && lastWord.word,
-					token: constants.ACCEPTION_STATES.includes(this.currentState) ? this.machineType : word.token ||null,
-				};
+				
 			}
 			if(accepted){
 				lastWord = word && word.word;
@@ -101,13 +131,42 @@ class DMRecog{
 			};
       
 	}
-
+	checkAcception(){
+		return constants.ACCEPTION_STATES.includes(this.currentState) || this.stillProcessing;
+	}
 
 	getStatus(){
+		// TODO - If necessary
 		return {
 			acceptedState: this.acceptedState,
 			error: this.error
 		};
+	}
+
+
+	// Check if the machine should be walking in the empty transition
+	checkEmptyTransition(word){
+		var emptyPossible = true;
+		const currentPossibleTransferenceFunctions =constants.GLOBAL_TRANSFERENCE_FUNCTIONS[this.currentState];
+		currentPossibleTransferenceFunctions.forEach((acceptableInputsArray, transferenceFunctionIndex) => {
+			if (emptyPossible && (acceptableInputsArray.includes(constants.EMPTY_TRANSITION) )) {
+				//Estamos supondo que só vai existir uma EMPTY transition
+				emptyPossible = emptyPossible && this.checkLookUp(word, constants.GLOBAL_STATE_MAPS[this.currentState][transferenceFunctionIndex]);
+			}
+		});
+
+		return emptyPossible;
+	}
+
+
+	// It checks if the word would be accepted by an next state if it receives it.
+	checkLookUp(word, possibleNextState){
+		// Caso tenhamos um estado que vai para si mesmo com vazio, temos um problema de recursão infinita aqui. Logo colocamos a condição de retorno básica.
+		if(possibleNextState == this.currentState)return false;
+		const simulationMachine = new DMRecog(null,this.machineLevel +1 ,possibleNextState);
+		const resultadoSimulation = simulationMachine.digestTheWordsArray([word]);
+		return !resultadoSimulation.length;
+
 	}
 }
 

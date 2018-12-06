@@ -13,7 +13,8 @@ async function main() {
 	while (fp.nextLine() && aceitacao) {
 		const wordsArray = fp.getLineWords();
 		console.log('-------Linha-------');
-		aceitacao = dm.digestTheWordsArray(wordsArray).token && aceitacao;
+		dm.digestTheWordsArray(wordsArray).token;
+		aceitacao = dm.checkAcception();
 		console.log('--Fim da Linha--');
 	}
 	if (aceitacao)console.log('Gramatica Aceita!');

@@ -62,7 +62,7 @@ class FileProcessor {
 				if (!lineWords.length || lineWords[lineWords.length - 1].token !== CHARACTER_EXTRACTOR.IDENTIFIER){
 					lineWords.push({
 						word: '',
-						token: CHARACTER_EXTRACTOR.IDENTIFIER,
+						token: openedQuotes ? CHARACTER_EXTRACTOR.STRING : CHARACTER_EXTRACTOR.IDENTIFIER,
 					});
 				}
 				lineWords[lineWords.length - 1].word += char;
@@ -79,7 +79,7 @@ class FileProcessor {
 					lineWords.push({
 						word:char,
 						// Talvez colocar outra coisa ?
-						token: CHARACTER_EXTRACTOR.SPECIAL
+						token: openedQuotes ? CHARACTER_EXTRACTOR.STRING : CHARACTER_EXTRACTOR.SPECIAL
 					});
 				}
 			}

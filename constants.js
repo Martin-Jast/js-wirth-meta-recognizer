@@ -6,6 +6,7 @@ const CHARACTER_EXTRACTOR = {
 	END_OF_LINE: 'EOL',
 	IDENTIFIER: 'identifier',
 	QUOTE_MARK: 'quote',
+	STRING: 'string',
 	SPECIAL: 'special',
 	ERROR: 'no_bussines',
 };
@@ -37,6 +38,7 @@ const EXP_STATE_MACHINE = {
 //Para colocar o contexto para o sintatico precisariamos colocar um "Tipo de nao terminal" diferente pra cada um desses caras
 const NT = [
 	CHARACTER_EXTRACTOR.IDENTIFIER,
+	CHARACTER_EXTRACTOR.STRING,
 	CHARACTER_EXTRACTOR.QUOTE_MARK
 ];
 
