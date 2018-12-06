@@ -118,12 +118,11 @@ class DMRecog{
 			lastWord = word && word.word;
 			initialInputClone.shift(); // Remove front since we already comsumed this word
 		}
-		if(accepted)
-			return {
-				word: initialInputClone[0],
-				token: this.machineType,
-				leftWords: initialInputClone,
-			};
+		return {
+			word: initialInputClone[0],
+			token: this.machineType,
+			leftWords: initialInputClone,
+		};
 
 	}
 	checkAcception(){
