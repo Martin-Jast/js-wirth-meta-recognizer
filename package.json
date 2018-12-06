@@ -1,0 +1,16 @@
+{
+  "name": "comp",
+  "version": "1.0.0",
+  "engines": {
+    "node": "8.9.3",
+    "npm": "5.6.0"
+  },
+  "scripts": {
+    "start": "node main.js"
+  },
+  "dependencies": {
+    "eslint": "^5.9.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-import": "^2.14.0"
+  }
+}
