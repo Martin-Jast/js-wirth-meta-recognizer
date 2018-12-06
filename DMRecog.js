@@ -64,7 +64,7 @@ class DMRecog{
 				if(resultadoPilha.leftWords.length > 0){
 					this.pilha = [];
 				}else{
-					return true; // We consumed everything. But we still have state machines on the stack, we are NOT in an acceptable state (probably...)
+					return resultadoPilha; // We consumed everything. But we still have state machines on the stack. So it makes no sense in destroying them
 				}
 			}
 			if (!word.token) word = {...initialInputClone[0]};
