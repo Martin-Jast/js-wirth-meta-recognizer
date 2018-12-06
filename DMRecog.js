@@ -2,8 +2,9 @@ const constants = require('./constants');
 
 
 class DMRecog{
-	constructor(machineType, machineLevel, startingState){
+	constructor(machineType, machineLevel, startingState, smCreator){
 		if (machineType === 'EXP'){
+			//Agora que tem um starting state nao precisa de machine mais. Arrancar fora
 			this.stateMap = constants.EXP_STATE_MACHINE;
 			this.currentState = 'EXP_START';
 			this.pilha = [];
@@ -13,6 +14,8 @@ class DMRecog{
 		this.machineLevel = machineLevel;
 		this.stillProcessing = false;
 		this.emptyTransition = null;
+		this.smCreator = smCreator;
+		this.totalDigestedWords = [];
 		this.currentState = startingState ? startingState : this.currentState;
 	}
 
@@ -62,15 +65,15 @@ class DMRecog{
 				const resultadoPilha = this.pilha[this.pilha.length - 1].digestTheWordsArray(initialInputClone);
 				initialInputClone = resultadoPilha.leftWords;
 				if(resultadoPilha.leftWords.length > 0){
-					word.word = resultadoPilha.word;
+					word.word = resultadoPilha.word || this.lastWord;
 					word.token = resultadoPilha.token;
 					this.pilha = [];
 					this.stillProcessing = false;
+					this.totalDigestedWords= resultadoPilha.word? this.totalDigestedWords : [...this.totalDigestedWords,resultadoPilha.word];
 				}else{
 					// We consumed everything. But we still have state machines on the stack. So it makes no sense in destroying them
 					this.stillProcessing = true;
 					return {
-						word,
 						...resultadoPilha
 					}; 
 				}
@@ -84,9 +87,9 @@ class DMRecog{
 			if (!wordValid) {
 				//Nao achamos uma transferencia direta, we have to go deeper
 				if (this.terminalTransition.length) {
-					// Empilhando
+					// Empilhando...
 					console.log('Podemos andar usando: ' + this.terminalTransition);
-					this.pilha.push(new DMRecog(this.terminalTransition[0], this.machineLevel + 1));
+					this.pilha.push(new DMRecog(this.terminalTransition[0], this.machineLevel + 1,null, this.smCreator));
 					return this.digestTheWordsArray(initialInputClone);
 				}else{
 					if(this.checkEmptyTransition(word)){
@@ -102,6 +105,7 @@ class DMRecog{
 							return {
 								leftWords: [lastWord, ...initialInputClone],
 								word: lastWord && lastWord.word,
+								totalDigestedWords: this.totalDigestedWords,
 								token: constants.ACCEPTION_STATES.includes(this.currentState) ? this.machineType : word.token ||null,
 							};
 						}
@@ -110,16 +114,19 @@ class DMRecog{
 					return {
 						leftWords: [lastWord, ...initialInputClone],
 						word: lastWord && lastWord.word,
+						totalDigestedWords: this.totalDigestedWords,
 						token: constants.ACCEPTION_STATES.includes(this.currentState) ? this.machineType : word.token ||null,
 					};
 				}
 				
 			}
-			lastWord = word && word.word;
+			lastWord = word && word.word ;
+			this.totalDigestedWords.push(word.word);
 			initialInputClone.shift(); // Remove front since we already comsumed this word
 		}
 		return {
-			word: initialInputClone[0],
+			word: initialInputClone[0]|| lastWord,
+			totalDigestedWords: this.totalDigestedWords,
 			token: this.machineType,
 			leftWords: initialInputClone,
 		};
@@ -151,7 +158,6 @@ class DMRecog{
 
 		return emptyPossible;
 	}
-
 
 	// It checks if the word would be accepted by an next state if it receives it.
 	checkLookUp(word, possibleNextState){

@@ -1,9 +1,12 @@
 const { FileProcessor } = require('./FileProcessor.js');
 const { DMRecog } = require('./DMRecog.js');
+const { StateMachineCreator } = require('./StateMachineCreator.js');
 
 
 const fp = new FileProcessor();
-const dm = new DMRecog('GRAMMAR', 0);
+const smCreator = new StateMachineCreator();
+const dm = new DMRecog('GRAMMAR', 0,null, smCreator);
+
 
 async function main() {
 
@@ -13,7 +16,7 @@ async function main() {
 	while (fp.nextLine() && aceitacao) {
 		const wordsArray = fp.getLineWords();
 		console.log('-------Linha-------');
-		dm.digestTheWordsArray(wordsArray).token;
+		const result = dm.digestTheWordsArray(wordsArray);
 		aceitacao = dm.checkAcception();
 		console.log('--Fim da Linha--');
 	}

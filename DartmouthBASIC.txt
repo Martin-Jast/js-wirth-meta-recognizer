@@ -10,7 +10,7 @@ Data = "DATA" Snum { "," Snum } .
 Print = "PRINT" [ Pitem { "," Pitem } [ "," ] ].
 Pitem = Exp | """ Character { Character } """ [ Exp ] .
 Goto = ( "GOTO" | "GO" "TO" ) int .
-If = "IF" Exp ( ">=" | ">" | "<>" | "<" | "<=" | "=" ) Exp "THEN" int .
+If = "IF" Exp ( ">=" | ">" | "<     >" | "<" | "<=" | "=" ) Exp "THEN" int .
 For = "FOR" letter [ digit ] "=" Exp "TO" Exp [ "STEP" Exp ] .
 Next = "NEXT" letter [ digit ] .
 Dim = "DIM" letter "(" int { "," int } ")" { "," letter "(" int { "," int } ")" } .

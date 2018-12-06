@@ -1,4 +1,5 @@
 
+const RESERVED_CHARS = ['{', '}', '[', ']', '(', ')', '"', '.', '=', '|'];
 
 const CHARACTER_EXTRACTOR = {
 	//TODO: Trocar pelos corretos
@@ -9,8 +10,11 @@ const CHARACTER_EXTRACTOR = {
 	STRING: 'string',
 	SPECIAL: 'special',
 	ERROR: 'no_bussines',
+	DIGIT: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'],
+	LETTER: ['a','b','c','d','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','x','y','z',
+		'A','B','C','D','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','X','Y','Z'],
+	DELIMITER: RESERVED_CHARS,
 };
-const RESERVED_CHARS = ['{', '}', '[', ']', '(', ')', '"', '.', '=', '|'];
 
 // This is following the same states as shown in the slides
 // We will define states by it's name and the transitions it follows
@@ -35,11 +39,12 @@ const EXP_STATE_MACHINE = {
 	'POS_EXP_IN_BRACES': ['ACCEPTED_EXP'],
 };
 
-//Para colocar o contexto para o sintatico precisariamos colocar um "Tipo de nao terminal" diferente pra cada um desses caras
 const NT = [
 	CHARACTER_EXTRACTOR.IDENTIFIER,
 	CHARACTER_EXTRACTOR.STRING,
-	CHARACTER_EXTRACTOR.QUOTE_MARK
+	CHARACTER_EXTRACTOR.QUOTE_MARK,
+	...CHARACTER_EXTRACTOR.DIGIT,
+	...CHARACTER_EXTRACTOR.LETTER,
 ];
 
 const EMPTY_TRANSITION = 'EMPTY_TRANSITION';

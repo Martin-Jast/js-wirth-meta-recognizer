@@ -58,7 +58,7 @@ class FileProcessor {
 		while(line && line.length >= 0){
 			const char = characterExtractor(line);
 			line = this.popLineCharacter(line);
-			if(isLetterOrNumber(char)){
+			if(isLetterOrNumber(char) || (openedQuotes && char === ' ')){
 				if (!lineWords.length || lineWords[lineWords.length - 1].token !== CHARACTER_EXTRACTOR.IDENTIFIER){
 					lineWords.push({
 						word: '',
@@ -75,10 +75,10 @@ class FileProcessor {
 
 				openedQuotes = !openedQuotes;
 			} else{
-				if(char !== '\r' && char !== ' '){
+				// So nao excluimos espacos em casos de strings
+				if((char !== '\r'&& char !== ' ')){
 					lineWords.push({
 						word:char,
-						// Talvez colocar outra coisa ?
 						token: openedQuotes ? CHARACTER_EXTRACTOR.STRING : CHARACTER_EXTRACTOR.SPECIAL
 					});
 				}
