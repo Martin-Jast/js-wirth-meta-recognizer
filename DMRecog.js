@@ -54,7 +54,6 @@ class DMRecog{
 			this.currentState = 'START';
 			this.pilha = [];
 		}
-		var accepted = true;
 		while(initialInputClone.length > 0){
 			let word = {};
 			if (this.pilha.length) {
@@ -116,10 +115,8 @@ class DMRecog{
 				}
 				
 			}
-			if(accepted){
-				lastWord = word && word.word;
-				initialInputClone.shift(); // Remove front since we already comsumed this word
-			}
+			lastWord = word && word.word;
+			initialInputClone.shift(); // Remove front since we already comsumed this word
 		}
 		if(accepted)
 			return {
