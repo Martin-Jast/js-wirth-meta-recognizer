@@ -2,8 +2,6 @@ const constants = require('./constants');
 
 
 class DMRecog{
-
-
 	constructor(machineType, machineLevel){
 		if (machineType === 'EXP'){
 			this.stateMap = constants.EXP_STATE_MACHINE;
@@ -20,7 +18,7 @@ class DMRecog{
 		// get current state transitions
 		console.log('Level ' + this.machineLevel +' - Machine State: ' + this.currentState + ', Word: ' + JSON.stringify(word));
 		const currentPossibleTransferenceFunctions =constants.GLOBAL_TRANSFERENCE_FUNCTIONS[this.currentState];
-		this.terminalTransition = []; 
+		this.terminalTransition = [];
 		currentPossibleTransferenceFunctions.forEach((acceptableInputsArray, transferenceFunctionIndex) => {
 			if (!this.terminalTransition.length)this.terminalTransition = acceptableInputsArray.filter(transference => transference.indexOf(constants.TERM[0]) >= 0 || transference.indexOf(constants.TERM[1]) >= 0);
 			else this.terminalTransition = [];
@@ -43,7 +41,7 @@ class DMRecog{
 	// Dado que estamos num estado X pegamos todas as transições no estado X usando o mapaDeFuncoes[X].
 	// Esse para sabermos qual o proximo estado (e se podemos ir para ele) só precisamos saber qual o numero
 	// Da array que contém o que veio, pegamos então essa valor K do mapa de transicoes mapaDeTransiçoes[X][K]
-  
+
 	digestTheWordsArray(wordsArray){
 		var initialInputClone = [...wordsArray];
 		var lastWord = null; // Odeio fazer isso mas não tem jeito....
@@ -51,7 +49,7 @@ class DMRecog{
 			this.currentState = 'START';
 			this.pilha = [];
 		}
-		var accepted = true;      
+		var accepted = true;
 		while(initialInputClone.length > 0){
 			let word = {};
 			if (this.pilha.length) {
@@ -99,7 +97,7 @@ class DMRecog{
 				token: this.machineType,
 				leftWords: initialInputClone,
 			};
-      
+
 	}
 
 
