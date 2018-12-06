@@ -74,8 +74,8 @@ class FileProcessor {
 				});
 
 				openedQuotes = !openedQuotes;
-			}else{
-				if(char !== '\r' && char !== ' '){              
+			} else{
+				if(char !== '\r' && char !== ' '){
 					lineWords.push({
 						word:char,
 						// Talvez colocar outra coisa ?
