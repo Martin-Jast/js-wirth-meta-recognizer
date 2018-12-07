@@ -5,17 +5,19 @@ const CHARACTER_EXTRACTOR = {
 	//TODO: Trocar pelos corretos
 	END_OF_FILE: 'EOF',
 	END_OF_LINE: 'EOL',
-	IDENTIFIER: 'identifier',
+	IDENTIFIER: 'Identifier',
+	NUMBER: 'Number',
 	QUOTE_MARK: 'quote',
-	STRING: 'string',
+	STRING: 'String',
 	SPECIAL: 'special',
 	ERROR: 'no_bussines',
-	DIGIT: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'],
-	LETTER: ['a','b','c','d','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','x','y','z',
-		'A','B','C','D','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','X','Y','Z'],
-	DELIMITER: RESERVED_CHARS,
+	DIGIT: 'Digit',
+	LETTER: 'Character',
+	DELIMITER: 'Delimiter',
 };
-
+const DIGIT = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+const LETTERS = ['a','b','c','d','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','x','y','z',
+	'A','B','C','D','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','X','Y','Z'];
 // This is following the same states as shown in the slides
 // We will define states by it's name and the transitions it follows
 const WIRTH_STATE_MACHINE = {
@@ -39,19 +41,24 @@ const EXP_STATE_MACHINE = {
 	'POS_EXP_IN_BRACES': ['ACCEPTED_EXP'],
 };
 
+const WIRTH_NON_TERMINALS = [
+	'GRAMMAR',
+	'EXP'
+];
+
 const NT = [
 	CHARACTER_EXTRACTOR.IDENTIFIER,
-	CHARACTER_EXTRACTOR.STRING,
-	CHARACTER_EXTRACTOR.QUOTE_MARK,
-	...CHARACTER_EXTRACTOR.DIGIT,
-	...CHARACTER_EXTRACTOR.LETTER,
+	...WIRTH_NON_TERMINALS	
 ];
 
 const EMPTY_TRANSITION = 'EMPTY_TRANSITION';
 
 const TERM = [
-	'GRAMMAR',
-	'EXP'];
+	CHARACTER_EXTRACTOR.STRING,
+	CHARACTER_EXTRACTOR.QUOTE_MARK,
+	...DIGIT,
+	...LETTERS,
+];
 
 const WIRTH_TRANSFERENCE_FUNCTIONS = {
 	'START' : [NT],
@@ -94,6 +101,7 @@ module.exports={
 	NT,
 	TERM,
 	ACCEPTION_STATES,
+	RESERVED_CHARS,
 	EMPTY_TRANSITION,
 	CHARACTER_EXTRACTOR,
 	EXP_STATE_MACHINE,
