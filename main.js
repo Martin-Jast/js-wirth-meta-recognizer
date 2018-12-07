@@ -1,6 +1,7 @@
 const { FileProcessor } = require('./FileProcessor.js');
 const { DMRecog } = require('./DMRecog.js');
 const { StateMachineCreator } = require('./StateMachineCreator.js');
+const  fs  = require('fs');
 
 
 const fp = new FileProcessor();
@@ -18,7 +19,18 @@ async function main() {
 		const result = dm.digestTheWordsArray(wordsArray);
 		aceitacao = dm.checkAcception();
 	}
-	if (aceitacao)console.log('Gramatica Aceita!');
+	if (aceitacao){
+		console.log('Gramatica Aceita!');
+		smCreator.basicReduce();
+		fs.writeFile('automatoStados.txt', JSON.stringify(smCreator.getMap()), function(err) {
+			if (err) throw err;
+		  });
+		  fs.writeFile('automatoTrans.txt', JSON.stringify(smCreator.getTrans()), function(err) {
+			if (err) throw err;
+		  });
+	}
+
+	
 	else console.log('Gramatica rejeitada');
 }
 main();

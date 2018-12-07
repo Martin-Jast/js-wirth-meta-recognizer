@@ -161,6 +161,14 @@ class StateMachineCreator{
 		this.stateCounter += 1;
 	}
 
+	getMap(){
+		return this.statesMap;
+	}
+
+	getTrans(){
+		return this.transitionsMap;
+	}
+
 	newScopedSetOfElements(NT){
 		//Rotina Semantica 3
 		//Ocorre quando achamos um '[' não string

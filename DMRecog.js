@@ -45,50 +45,50 @@ class DMRecog{
 			this.emptyTransition = acceptableInputsArray.filter(transference => transference.indexOf(constants.EMPTY_TRANSITION) >= 0).length > 0 ? transferenceFunctionIndex : null; 
 			// if we didn't find a suitable next state we try, else just ignore it,  we know where we are going
 			if(word.word === '}')
-				//console.log(this.currentState, this.machineLevel);
-				if (!wordValid && (acceptableInputsArray.includes(word.token) || acceptableInputsArray.includes(word.word))) {
+				console.log(this.currentState, this.machineLevel);
+			if (!wordValid && (acceptableInputsArray.includes(word.token) || acceptableInputsArray.includes(word.word))) {
 				// We found a suitable next State
-					wordValid = true;
-					this.currentState = constants.GLOBAL_STATE_MAPS[this.currentState][transferenceFunctionIndex];
+				wordValid = true;
+				this.currentState = constants.GLOBAL_STATE_MAPS[this.currentState][transferenceFunctionIndex];
 
-					if(word.word === '(' ||word.word === '='){
-						//--- StateMachine Creator Call -- Rotina Semantica 2
-					//console.log('StateMachine Creator Call -- Rotina Semantica 2');
-						this.smCreator.newScopeDefined();
-						//--- End -- Rotina Semantica 2
-					}else if(word.word == '[' && word.token === constants.CHARACTER_EXTRACTOR.DELIMITER) {
+				if(word.word === '(' ||word.word === '='){
+				//--- StateMachine Creator Call -- Rotina Semantica 2
+					console.log('StateMachine Creator Call -- Rotina Semantica 2');
+					this.smCreator.newScopeDefined();
+				//--- End -- Rotina Semantica 2
+				}else if(word.word == '[' && word.token === constants.CHARACTER_EXTRACTOR.DELIMITER) {
 					//--- StateMachine Creator Call -- Rotina Semantica 3
-					//console.log('StateMachine Creator Call -- Rotina Semantica 3');
-						this.smCreator.newScopedSetOfElements();
+					console.log('StateMachine Creator Call -- Rotina Semantica 3');
+					this.smCreator.newScopedSetOfElements();
 					//--- End -- Rotina Semantica 3
-					}else if(word.word == '{' && word.token === constants.CHARACTER_EXTRACTOR.DELIMITER) {
+				}else if(word.word == '{' && word.token === constants.CHARACTER_EXTRACTOR.DELIMITER) {
 					//--- StateMachine Creator Call -- Rotina Semantica 4
-					//console.log('StateMachine Creator Call -- Rotina Semantica 4');
-						this.smCreator.newScopedRepeatedSetOfElements();
+					console.log('StateMachine Creator Call -- Rotina Semantica 4');
+					this.smCreator.newScopedRepeatedSetOfElements();
 					//--- End -- Rotina Semantica 4
-					}else if(word.word == '}' || word.word == ']' || word.word === ')' && word.token === constants.CHARACTER_EXTRACTOR.DELIMITER){
+				}else if(word.word == '}' || word.word == ']' || word.word === ')' && word.token === constants.CHARACTER_EXTRACTOR.DELIMITER){
 					//--- StateMachine Creator Call -- Rotina Semantica 5
-					//console.log('StateMachine Creator Call -- Rotina Semantica 5');
-						this.smCreator.endScoped();
+					console.log('StateMachine Creator Call -- Rotina Semantica 5');
+					this.smCreator.endScoped();
 					//--- End -- Rotina Semantica 5
-					}else if(word.word == '|' && word.token === constants.CHARACTER_EXTRACTOR.DELIMITER){
+				}else if(word.word == '|' && word.token === constants.CHARACTER_EXTRACTOR.DELIMITER){
 					//--- StateMachine Creator Call -- Rotina Semantica 6
-					//console.log('StateMachine Creator Call -- Rotina Semantica 6');
-						this.smCreator.endOfOption();
+					console.log('StateMachine Creator Call -- Rotina Semantica 6');
+					this.smCreator.endOfOption();
 					//--- End -- Rotina Semantica 6
-					}else if(word.word == '.' && word.token === constants.CHARACTER_EXTRACTOR.DELIMITER ){
+				}else if(word.word == '.' && word.token === constants.CHARACTER_EXTRACTOR.DELIMITER ){
 					//--- StateMachine Creator Call -- Rotina Semantica 7
-					//console.log('StateMachine Creator Call -- Rotina Semantica 7');
-						this.smCreator.endScoped();
-						this.smCreator.endOfExternalScope();
+					console.log('StateMachine Creator Call -- Rotina Semantica 7');
+					this.smCreator.endScoped();
+					this.smCreator.endOfExternalScope();
 					//--- End -- Rotina Semantica 7
-					}else if(constants.NT.includes(word.token) || constants.NT.includes(word.word)){
+				}else if(constants.NT.includes(word.token) || constants.NT.includes(word.word)){
 					//--- StateMachine Creator Call -- Rotina Semantica 0
-					//console.log('StateMachine Creator Call -- Rotina Semantica 0');
-						this.smCreator.foundNT(word.word);
+					console.log('StateMachine Creator Call -- Rotina Semantica 0');
+					this.smCreator.foundNT(word.word);
 					//--- End -- Rotina Semantica 0
-					}
 				}
+			}
 		});
 
 		if (wordValid){
