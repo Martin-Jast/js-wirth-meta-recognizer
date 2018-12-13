@@ -28,21 +28,21 @@ class DMRecog{
 		currentPossibleTransferenceFunctions.forEach((acceptableInputsArray, transferenceFunctionIndex) => {
 			if (!this.terminalTransition.length)
 			{
-				this.terminalTransition = acceptableInputsArray.filter(transference => 
-					
+				this.terminalTransition = acceptableInputsArray.filter(transference =>
+
 				{
 					var acc = false;
 
 					constants.NT.forEach((nTerm)=> {
-						acc = !!(acc || 
+						acc = !!(acc ||
 					(transference.indexOf(nTerm) >= 0 || transference === nTerm));
 					});
 					return acc;
 				}
 				);}else
 				this.terminalTransition = [];
-			
-			this.emptyTransition = acceptableInputsArray.filter(transference => transference.indexOf(constants.EMPTY_TRANSITION) >= 0).length > 0 ? transferenceFunctionIndex : null; 
+
+			this.emptyTransition = acceptableInputsArray.filter(transference => transference.indexOf(constants.EMPTY_TRANSITION) >= 0).length > 0 ? transferenceFunctionIndex : null;
 			// if we didn't find a suitable next state we try, else just ignore it,  we know where we are going
 			if(word.word === '}')
 				console.log(this.currentState, this.machineLevel);
@@ -54,38 +54,38 @@ class DMRecog{
 				if(word.word === '(' ||word.word === '='){
 				//--- StateMachine Creator Call -- Rotina Semantica 2
 					console.log('StateMachine Creator Call -- Rotina Semantica 2');
-					this.smCreator.newScopeDefined();
+					if(this.smCreator)this.smCreator.newScopeDefined();
 				//--- End -- Rotina Semantica 2
 				}else if(word.word == '[' && word.token === constants.CHARACTER_EXTRACTOR.DELIMITER) {
 					//--- StateMachine Creator Call -- Rotina Semantica 3
 					console.log('StateMachine Creator Call -- Rotina Semantica 3');
-					this.smCreator.newScopedSetOfElements();
+					if(this.smCreator)this.smCreator.newScopedSetOfElements();
 					//--- End -- Rotina Semantica 3
 				}else if(word.word == '{' && word.token === constants.CHARACTER_EXTRACTOR.DELIMITER) {
 					//--- StateMachine Creator Call -- Rotina Semantica 4
 					console.log('StateMachine Creator Call -- Rotina Semantica 4');
-					this.smCreator.newScopedRepeatedSetOfElements();
+					if(this.smCreator)this.smCreator.newScopedRepeatedSetOfElements();
 					//--- End -- Rotina Semantica 4
 				}else if(word.word == '}' || word.word == ']' || word.word === ')' && word.token === constants.CHARACTER_EXTRACTOR.DELIMITER){
 					//--- StateMachine Creator Call -- Rotina Semantica 5
 					console.log('StateMachine Creator Call -- Rotina Semantica 5');
-					this.smCreator.endScoped();
+					if(this.smCreator)this.smCreator.endScoped();
 					//--- End -- Rotina Semantica 5
 				}else if(word.word == '|' && word.token === constants.CHARACTER_EXTRACTOR.DELIMITER){
 					//--- StateMachine Creator Call -- Rotina Semantica 6
 					console.log('StateMachine Creator Call -- Rotina Semantica 6');
-					this.smCreator.endOfOption();
+					if(this.smCreator)this.smCreator.endOfOption();
 					//--- End -- Rotina Semantica 6
 				}else if(word.word == '.' && word.token === constants.CHARACTER_EXTRACTOR.DELIMITER ){
 					//--- StateMachine Creator Call -- Rotina Semantica 7
 					console.log('StateMachine Creator Call -- Rotina Semantica 7');
-					this.smCreator.endScoped();
-					this.smCreator.endOfExternalScope();
+					if(this.smCreator)this.smCreator.endScoped();
+					if(this.smCreator)this.smCreator.endOfExternalScope();
 					//--- End -- Rotina Semantica 7
 				}else if(constants.NT.includes(word.token) || constants.NT.includes(word.word)){
 					//--- StateMachine Creator Call -- Rotina Semantica 0
 					console.log('StateMachine Creator Call -- Rotina Semantica 0');
-					this.smCreator.foundNT(word.word);
+					if(this.smCreator)this.smCreator.foundNT(word.word);
 					//--- End -- Rotina Semantica 0
 				}
 			}
@@ -128,7 +128,7 @@ class DMRecog{
 					this.stillProcessing = true;
 					return {
 						...resultadoPilha
-					}; 
+					};
 				}
 			}
 			if (!word.token) word = {...initialInputClone[0]};
@@ -140,25 +140,25 @@ class DMRecog{
 			if (!wordValid) {
 				//Nao achamos uma transferencia direta, we have to go deeper
 				if (this.terminalTransition.length) {
-					
-					
+
+
 					// Empilhando...
-					
+
 					if(this.debugOn)console.log('Podemos andar usando: ' + this.terminalTransition);
 					this.pilha.push(new DMRecog(this.terminalTransition[0], this.machineLevel + 1,null, this.smCreator));
 					this.pilha[this.pilha.length -1].debugOn = this.debugOn;
 					const stackResult = this.digestTheWordsArray(initialInputClone);
 					//--- StateMachine Creator Call -- Rotina Semantica 1
-					this.smCreator.foundNT(stackResult.word);
+					if(this.smCreator)this.smCreator.foundNT(stackResult.word);
 					//--- End -- Rotina Semantica 1
 					return stackResult;
 				}else{
 					if(this.checkEmptyTransition(word)){
 						if(this.debugOn)console.log('EMPTY SERVIRIA');
-						
+
 						if(this.emptyTransition !== null && this.emptyTransition !== undefined){
 							//--- StateMachine Creator Call -- Found empty_transition
-							this.smCreator.foundEmpty();
+							if(this.smCreator)this.smCreator.foundEmpty();
 							//--- End -- Found empty_transition
 							this.currentState = constants.GLOBAL_STATE_MAPS[this.currentState][this.emptyTransition];
 							// put the word back and go again
@@ -183,7 +183,7 @@ class DMRecog{
 						token: constants.ACCEPTION_STATES.includes(this.currentState) ? this.machineType : word.token ||null,
 					};
 				}
-				
+
 			}
 			lastWord = word && word.word ;
 			this.totalDigestedWords.push(word.word);
